@@ -1,0 +1,24 @@
+const { ethers } = require("hardhat");
+const { expect } = require("chai");
+
+describe("AIBalancer", function () {
+    let AIBalancer, aibalancer, owner, addr1;
+
+    beforeEach(async function () {
+        [owner, addr1] = await ethers.getSigners();
+        AIBalancer = await ethers.getContractFactory("AIBalancer");
+        aibalancer = await AIBalancer.deploy();
+        await aibalancer.deployed();
+    });
+
+    it("should allow deposits", async function () {
+        await aibalancer.connect(addr1).deposit({ value: ethers.utils.parseEther("1") });
+        expect(await aibalancer.balances(addr1.address)).to.equal(ethers.utils.parseEther("1"));
+    });
+
+    it("should allow withdrawals", async function () {
+        await aibalancer.connect(addr1).deposit({ value: ethers.utils.parseEther("1") });
+        await aibalancer.connect(addr1).withdraw(ethers.utils.parseEther("1"));
+        expect(await aibalancer.balances(addr1.address)).to.equal(0);
+    });
+});
